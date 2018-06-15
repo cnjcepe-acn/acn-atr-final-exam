@@ -1,0 +1,39 @@
+version: '3'
+services:
+  mong:
+    image: aashreys/mongo-auth:latest
+    environment:
+      - AUTH=yes
+      - MONGODB_ADMIN_USER=admin
+      - MONGODB_ADMIN_PASS=admin123
+      - MONGODB_APPLICATION_DATABASE=admin
+      - MONGODB_APPLICATION_USER=admin
+      - MONGODB_APPLICATION_PASS=admin123
+    ports:
+      - 27017:27017
+
+  mongodata:
+    build: ./mongodata
+    environment:
+      - MONGODB_ADMIN_USER=admin
+      - MONGODB_ADMIN_PASS=admin123
+    links:
+      - mong
+    depends_on:
+      - mong
+
+  memberservice:
+    build: .
+    environment:
+      - SPRING_DATA_MONGODB_HOST=mong
+      - SPRING_DATA_MONGODB_PORT=27017
+      - SPRING_DATA_MONGODB_DATABASE=admin
+      - SPRING_DATA_MONGODB_AUTENTIFICATION-DATABASE=admin
+      - SPRING_DATA_MONGODB_USERNAME=admin
+      - SPRING_DATA_MONGODB_PASSWORD=admin123
+    ports:
+      - 8686:8686
+    links:
+      - mong
+    depends_on:
+      - mongodata
